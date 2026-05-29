@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FocusFlow — Anti-procrastinación</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; padding: 1rem; }
+  .app { max-width: 420px; margin: 0 auto; padding-bottom: 2rem; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; padding-top: .5rem; }
+  .logo { width: 38px; height: 38px; background: #085041; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .logo i { font-size: 20px; color: #9FE1CB; }
+  .htitle { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+  .hsub { font-size: 12px; color: #888; }
+  .quote-band { background: #085041; border-radius: 14px; padding: 1rem 1.125rem; margin-bottom: 1rem; }
+  .quote-t { font-size: 14px; color: #9FE1CB; font-weight: 500; line-height: 1.5; }
+  .quote-a { font-size: 11px; color: #5DCAA5; margin-top: 5px; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .stat { background: #fff; border-radius: 10px; padding: .875rem 1rem; border: 1px solid #e8e8e2; }
+  .stat-n { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+  .stat-l { font-size: 11px; color: #888; margin-top: 2px; }
+  .card { background: #fff; border: 1px solid #e8e8e2; border-radius: 14px; padding: 1rem 1.125rem; margin-bottom: 1rem; }
+  .sec-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .875rem; display: flex; align-items: center; gap: 6px; }
+  .pills { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .pill { padding: 5px 13px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid #ddd; background: transparent; color: #666; transition: all .15s; }
+  .pill.on { background: #0F6E56; color: #E1F5EE; border-color: #0F6E56; }
+  .ring-wrap { display: flex; justify-content: center; margin-bottom: 1rem; }
+  .ring-inner { position: relative; width: 140px; height: 140px; }
+  .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #e8e8e2; stroke-width: 7; }
+  .ring-fg { fill: none; stroke: #1D9E75; stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .ring-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .ring-time { font-size: 26px; font-weight: 600; color: #1a1a1a; }
+  .ring-mode { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: .05em; }
+  .dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 1rem; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ddd; }
+  .dot.done { background: #1D9E75; }
+  .dot.cur { background: #9FE1CB; border: 2px solid #1D9E75; }
+  .btns { display: flex; gap: 8px; justify-content: center; }
+  .btn { border: 1px solid #ddd; background: transparent; border-radius: 9px; padding: 9px 20px; font-size: 13px; cursor: pointer; color: #1a1a1a; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+  .btn:hover { background: #f5f5f0; }
+  .btn-go { background: #0F6E56; color: #E1F5EE; border-color: #0F6E56; }
+  .btn-go:hover { background: #085041; border-color: #085041; }
+  .add-row { display: flex; gap: 6px; margin-bottom: .75rem; }
+  .add-row input { flex: 1; border: 1px solid #ddd; border-radius: 9px; padding: 8px 11px; font-size: 13px; background: #fff; color: #1a1a1a; outline: none; }
+  .add-row input:focus { border-color: #1D9E75; }
+  .add-row select { border: 1px solid #ddd; border-radius: 9px; padding: 8px 8px; font-size: 12px; background: #fff; color: #666; outline: none; }
+  .prog-wrap { margin-bottom: .75rem; }
+  .prog-top { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 4px; }
+  .prog-bar { height: 5px; background: #e8e8e2; border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: #1D9E75; border-radius: 3px; transition: width .3s; }
+  .task-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 1px solid #eee; border-radius: 9px; margin-bottom: 5px; transition: background .1s; }
+  .task-item:hover { background: #f9f9f6; }
+  .task-item.done-t { opacity: .45; }
+  .task-item.done-t .tname { text-decoration: line-through; }
+  .chk { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+  .chk.yes { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+  .tname { flex: 1; font-size: 13px; color: #1a1a1a; }
+  .badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+  .b-hi { background: #FCEBEB; color: #791F1F; }
+  .b-md { background: #FAEEDA; color: #633806; }
+  .b-lo { background: #EAF3DE; color: #27500A; }
+  .tdel { font-size: 14px; color: #bbb; cursor: pointer; opacity: 0; transition: opacity .15s; }
+  .task-item:hover .tdel { opacity: 1; }
+  .empty { text-align: center; padding: 1.5rem; color: #aaa; font-size: 13px; line-height: 1.8; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo"><i class="ti ti-bolt"></i></div>
+    <div>
+      <div class="htitle">FocusFlow</div>
+      <div class="hsub">Anti-procrastinación</div>
+    </div>
+  </div>
+
+  <div class="quote-band">
+    <div class="quote-t" id="qt">"Empieza donde estás. Usa lo que tienes. Haz lo que puedes."</div>
+    <div class="quote-a" id="qa">— Arthur Ashe</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="s-ses">0</div><div class="stat-l">Sesiones hoy</div></div>
+    <div class="stat"><div class="stat-n" id="s-tasks">0</div><div class="stat-l">Tareas hechas</div></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-label"><i class="ti ti-clock"></i> Temporizador Pomodoro</div>
+    <div class="pills">
+      <button class="pill on" onclick="setMode(this,25,'Enfoque')">Enfoque 25m</button>
+      <button class="pill" onclick="setMode(this,5,'Pausa corta')">Pausa 5m</button>
+      <button class="pill" onclick="setMode(this,15,'Pausa larga')">Pausa 15m</button>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring-inner">
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="50"/>
+          <circle class="ring-fg" id="ring" cx="60" cy="60" r="50" stroke-dasharray="314.2" stroke-dashoffset="0"/>
+        </svg>
+        <div class="ring-txt">
+          <div class="ring-time" id="tdisp">25:00</div>
+          <div class="ring-mode" id="tmode">Enfoque</div>
+        </div>
+      </div>
+    </div>
+    <div class="dots" id="sdots">
+      <div class="dot cur"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="btns">
+      <button class="btn" onclick="resetT()"><i class="ti ti-refresh"></i> Reset</button>
+      <button class="btn btn-go" id="gbtn" onclick="toggleT()">
+        <i class="ti ti-player-play" id="gico"></i> <span id="glbl">Iniciar</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-label"><i class="ti ti-list-check"></i> Tareas del día</div>
+    <div class="add-row">
+      <input type="text" id="tinp" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter')addT()">
+      <select id="tprio">
+        <option value="hi">Alta</option>
+        <option value="md" selected>Media</option>
+        <option value="lo">Baja</option>
+      </select>
+      <button class="btn btn-go" onclick="addT()" style="padding:8px 12px"><i class="ti ti-plus"></i></button>
+    </div>
+    <div id="prog-area" style="display:none" class="prog-wrap">
+      <div class="prog-top"><span>Progreso</span><span id="prog-lbl">0/0</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+    </div>
+    <div id="tlist">
+      <div class="empty"><i class="ti ti-circle-plus" style="font-size:24px"></i><br>Agrega tu primera tarea del día</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QS = [
+  {t:'"Empieza donde estás. Usa lo que tienes. Haz lo que puedes."', a:'— Arthur Ashe'},
+  {t:'"La acción es la cura fundamental de la procrastinación."', a:'— Mark Twain'},
+  {t:'"Un pequeño paso hoy vale más que mil planes mañana."', a:'— Proverbio'},
+  {t:'"No cuentes los días, haz que los días cuenten."', a:'— Muhammad Ali'},
+  {t:'"Hazlo ahora. A veces el después se convierte en nunca."', a:'— Anónimo'},
+  {t:'"La disciplina es elegir entre lo que quieres ahora y lo que más quieres."', a:'— Abraham Lincoln'},
+];
+let qi = 0;
+let tot = 25*60, rem = 25*60, running = false, iv = null, sessions = 0;
+let tasks = [];
+const C = 314.2;
+
+function setMode(el, m, lbl) {
+  if (running) return;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  tot = m * 60; rem = tot;
+  document.getElementById('tmode').textContent = lbl;
+  updDisp();
+}
+
+function toggleT() {
+  running = !running;
+  document.getElementById('gico').className = running ? 'ti ti-player-pause' : 'ti ti-player-play';
+  document.getElementById('glbl').textContent = running ? 'Pausar' : 'Continuar';
+  if (running) iv = setInterval(tick, 1000);
+  else clearInterval(iv);
+}
+
+function resetT() {
+  running = false; clearInterval(iv); rem = tot;
+  document.getElementById('gico').className = 'ti ti-player-play';
+  document.getElementById('glbl').textContent = 'Iniciar';
+  updDisp();
+}
+
+function tick() {
+  if (rem <= 0) {
+    clearInterval(iv); running = false;
+    document.getElementById('gico').className = 'ti ti-player-play';
+    document.getElementById('glbl').textContent = 'Iniciar';
+    sessions++;
+    document.getElementById('s-ses').textContent = sessions;
+    updDots();
+    qi = (qi + 1) % QS.length;
+    document.getElementById('qt').textContent = QS[qi].t;
+    document.getElementById('qa').textContent = QS[qi].a;
+    rem = tot; updDisp();
+    if (Notification.permission === 'granted') {
+      new Notification('¡Sesión completada!', { body: 'Toma un descanso bien ganado.' });
+    }
+    return;
+  }
+  rem--; updDisp();
+}
+
+function updDisp() {
+  const m = Math.floor(rem/60), s = rem % 60;
+  document.getElementById('tdisp').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  document.getElementById('ring').style.strokeDashoffset = C * (1 - rem/tot);
+}
+
+function updDots() {
+  const ds = document.querySelectorAll('.dot'), cur = sessions % 4;
+  ds.forEach((d,i) => {
+    d.className = 'dot';
+    if (i < cur) d.classList.add('done');
+    else if (i === cur) d.classList.add('cur');
+  });
+}
+
+function addT() {
+  const v = document.getElementById('tinp').value.trim();
+  if (!v) return;
+  tasks.push({ id: Date.now(), name: v, prio: document.getElementById('tprio').value, done: false });
+  document.getElementById('tinp').value = '';
+  render();
+}
+
+function togT(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) t.done = !t.done;
+  document.getElementById('s-tasks').textContent = tasks.filter(x => x.done).length;
+  render();
+}
+
+function delT(id) {
+  tasks = tasks.filter(x => x.id !== id);
+  render();
+}
+
+const PL = { hi:'Alta', md:'Media', lo:'Baja' };
+const PC = { hi:'b-hi', md:'b-md', lo:'b-lo' };
+
+function render() {
+  const l = document.getElementById('tlist'), pa = document.getElementById('prog-area');
+  if (!tasks.length) {
+    l.innerHTML = '<div class="empty"><i class="ti ti-circle-plus" style="font-size:24px"></i><br>Agrega tu primera tarea del día</div>';
+    pa.style.display = 'none'; return;
+  }
+  const s = [...tasks].sort((a,b) => ({hi:0,md:1,lo:2}[a.prio] - {hi:0,md:1,lo:2}[b.prio]));
+  l.innerHTML = s.map(t => `
+    <div class="task-item${t.done?' done-t':''}">
+      <div class="chk${t.done?' yes':''}" onclick="togT(${t.id})">
+        ${t.done ? '<i class="ti ti-check" style="font-size:10px"></i>' : ''}
+      </div>
+      <span class="tname">${t.name}</span>
+      <span class="badge ${PC[t.prio]}">${PL[t.prio]}</span>
+      <i class="ti ti-x tdel" onclick="delT(${t.id})"></i>
+    </div>`).join('');
+  const done = tasks.filter(x => x.done).length;
+  const pct = Math.round(done / tasks.length * 100);
+  pa.style.display = 'block';
+  document.getElementById('prog-lbl').textContent = done + '/' + tasks.length;
+  document.getElementById('pfill').style.width = pct + '%';
+}
+
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+</script>
+</body>
+</html>
